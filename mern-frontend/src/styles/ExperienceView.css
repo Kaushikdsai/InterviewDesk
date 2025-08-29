@@ -1,0 +1,11 @@
+.exp-view-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.interview-exp-btn{
+    width: 10px;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+}

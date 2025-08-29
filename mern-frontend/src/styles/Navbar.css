@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: black;
+    color: white;
+    padding: 18px;
+}
+.nav-right{
+    margin-right: 6%;
+}
