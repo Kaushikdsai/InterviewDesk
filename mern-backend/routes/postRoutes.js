@@ -1,10 +1,10 @@
 const express=require('express');
 const router=express.Router();
 const Post=require('../models/Post');
-const authMiddleware=require('../middleware/authMiddleware');
+const {authMiddleware,adminMiddleware}=require('../middleware/authMiddleware');
 
 router.get('/', async (req,res) => {
-    const posts=await Post.find().populate('author','name regNo');
+    const posts=await Post.find().populate('author','name batch');
     res.json(posts);
 })
 
@@ -22,6 +22,16 @@ router.post('/', authMiddleware, async (req,res) => {
         }) 
         await newPost.save();
         res.status(201).json({ message: 'Post created',newPost });
+    }
+    catch(err){
+        res.status(500).json({ message: err.message });
+    }
+});
+
+router.delete('/:id',adminMiddleware,async(req,res) => {
+    try{
+        await Post.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Post deleted successfully'});
     }
     catch(err){
         res.status(500).json({ message: err.message });

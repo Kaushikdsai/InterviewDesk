@@ -13,3 +13,15 @@ nav{
 .nav-right{
     margin-right: 6%;
 }
+.logout-btn{
+    background-color: black;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+.logout-confirm{
+    h1{
+        font-size: 18px;
+    }
+    margin-left: 84%;
+}

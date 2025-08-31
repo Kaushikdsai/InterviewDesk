@@ -12,13 +12,13 @@ function App() {
   return (
     <>
       <div>
-        <Navbar />
         <Router>
+          <Navbar />
           <Routes>
             <Route path='/h' element={<ExperienceCard />} />
             <Route path='/login' element={<StudentLogin />} />
             <Route path='/register' element={<StudentRegister />} />
-            <Route path='/exp' element={<ExperienceView />} />
+            <Route path='/' element={<ExperienceView />} />
             <Route path='/add-experience' element={<AddExperience />} />
           </Routes>
         </Router>

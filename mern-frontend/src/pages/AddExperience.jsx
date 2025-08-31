@@ -19,6 +19,11 @@ const AddExperience = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const token=localStorage.getItem('token');
+        if(!token){
+            alert('You must be logged in!');
+            return;
+        }
         try{
             const payload = {
                 company: formData.company,
@@ -28,12 +33,11 @@ const AddExperience = () => {
                 questions: formData.questions.split('\n'),
                 additionalInfo: formData.additionalInfo
             };
-            const token=localStorage.getItem('token');
             await axios.post('http://localhost:5000/api/posts', payload, {
                 headers: {Authorization: `Bearer ${token}`}
             });
-
-            navigate('/experienceView');
+            alert('Experience posted successfully!');
+            navigate('/');
         }
         catch(err){
             console.error(err);

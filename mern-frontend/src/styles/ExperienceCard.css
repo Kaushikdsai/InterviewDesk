@@ -1,14 +1,46 @@
+.top-layer{
+    width: 100%;
+    background-color: red;
+    height: 16px;
+}
 .card{
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
+    align-items: flex-start;
+    width: 290px;
+    padding: 16px;
+    background-color: rgb(231, 231, 231);
 }
+
 .btn{
-    display: flex;
-    flex-direction: row;
     button{
-        width: 80px;
+        cursor: pointer;
         border: none;
+        background-color: rgb(231, 231, 231);
     }
+}
+
+img{
+    width: 14px;
+}
+
+.card h1, .card h2, .card h3{
+    margin: 0;
+    margin-bottom: 6px;
+}
+
+.card h1{
+    font-size: 28px;
+}
+
+.card h2{
+    color: rgb(125, 34, 34);
+    font-size: 20px;
+}
+
+.card h3{
+    font-size: 17px;
+}
+a{
+    margin-bottom: 12px;
 }

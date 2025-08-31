@@ -1,19 +1,41 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 import ExperienceCard from '../components/ExperienceCard'; 
 import '../styles/ExperienceView.css'
 
 const ExperienceView = () => {
     const [posts,setPosts]=useState([]);
+    const [filteredPosts,setFilteredPosts]=useState([]);
     const [loading,setLoading]=useState(true);
+    const [loggedin,setLoggedin]=useState(false);
+
+    const [roleFilter,setRoleFilter]=useState('');
+    const [companyFilter,setCompanyFilter]=useState('');
+    const [statusFilter,setStatusFilter]=useState('');
+    const [nameFilter,setNameFilter]=useState('');
+    const [batchFilter,setBatchFilter]=useState('');
+    const [currentUser,setCurrentUser]=useState('');
+
     const navigate=useNavigate();
+    const token=localStorage.getItem('token');
 
     useEffect(() => {
+        if(!token){
+            setLoggedin(false);
+        }
+        if(token){
+            setLoggedin(true);
+            const decoded=jwtDecode(token);
+            setCurrentUser({ role: decoded.role });
+        }
+
         const fetchPosts=async () => {
             try{
                 const res=await axios.get('http://localhost:5000/api/posts');
                 setPosts(res.data);
+                setFilteredPosts(res.data);
             }
             catch(err){
                 console.error(err);
@@ -23,26 +45,71 @@ const ExperienceView = () => {
             }
         };
         fetchPosts();
-    },[]);
+    },[token]);
 
     if(loading){
         return <h1>Loading...</h1>
     }
 
+    const applyFilters = () => {
+        const filtered=posts.filter(post => 
+            (roleFilter==='' || post.role.toLowerCase().includes(roleFilter.toLowerCase())) && 
+            (companyFilter === '' || post.company.toLowerCase().includes(companyFilter.toLowerCase())) &&
+            (statusFilter === '' || post.status.toLowerCase().includes(statusFilter.toLowerCase())) &&
+            (nameFilter === '' || post.author?.name.toLowerCase().includes(nameFilter.toLowerCase())) && 
+            (batchFilter === '' || post.author?.batch.toLowerCase().includes(batchFilter.toLowerCase()))
+        );
+        setFilteredPosts(filtered);
+    };
+
+    const handleDelete = async(id) => {
+        try{
+            await axios.delete(`http://localhost:5000/api/posts/${id}`, {
+                headers: { Authorization: `Bearer ${token}`}
+            });
+            setPosts(prev => prev.filter(p => p._id !== id));
+            setFilteredPosts(filteredPosts.filter(p => p._id !== id));
+            alert('Post deleted successfully');
+        }
+        catch(err){
+            console.error(err);
+            alert('Failed to delete post');
+        }
+    }
+
+    const handleLogout = () => {
+        navigate('/login');
+    }
+
     return (
-        <div className='exp-view-container'>
-            <button className='interview-exp-btn' onClick={() => navigate('/add-experience')}>Share your interview experience</button>
-            <div>
-                {posts.length>0 ? (
-                    posts.map(post => (
-                        <div>
-                            <ExperienceCard key={post._id} id={post._id} role={post.role} company={post.company} status={post.status} />
-                        </div>
-                    ))
-                ) : (
-                    <p>No posts found.</p>
-                )}
-            </div>
+        <div>
+            {loggedin? (
+                <div className='exp-view-container'>
+                    <button className='interview-exp-btn' onClick={() => navigate('/add-experience')}>Share your interview experience</button>
+                    <div className='filter-bar'>
+                        <input placeholder='Search by role' value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} />
+                        <input placeholder='Search by company' value={companyFilter} onChange={(e) => setCompanyFilter(e.target.value)} />
+                        <input placeholder='Search by job status' value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} />
+                        <input placeholder='Search by name' value={nameFilter} onChange={(e) => setNameFilter(e.target.value)} />
+                        <input placeholder='Search by batch' value={batchFilter} onChange={(e) => setBatchFilter(e.target.value)} />
+                        <br />
+                        <button className='apply-filter-btn' onClick={applyFilters}>Apply Filter</button>
+                    </div>
+                    <div className='exp-cards-container'>
+                        {filteredPosts.length>0 ? (
+                            filteredPosts.map(post => (
+                                <div key={post._id} className='exp-card'>
+                                    <ExperienceCard id={post._id} role={post.role} company={post.company} status={post.status} studentName={post.author?.name} studentBatch={post.author?.batch} onDelete={handleDelete}/>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No posts found.</p>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                alert('Please login')
+            )};
         </div>
     )
 }
