@@ -5,7 +5,7 @@ import thumbsDown from '../assets/thumb-down.png'
 import thumbsUp from '../assets/thumb-up (1).png'
 import reportIcon from '../assets/flag.png'
 
-const ExperienceCard = ({ id,company,role,status,studentName,studentBatch,currentUser,onDelete }) => {
+const ExperienceCard = ({ id,company,user,role,status,studentName,studentBatch,onDelete }) => {
     const [likes,setLikes]=useState(0);
     const [dislikes,setDislikes]=useState(0);
     const [report,setReport]=useState(0);
@@ -40,7 +40,7 @@ const ExperienceCard = ({ id,company,role,status,studentName,studentBatch,curren
                     <button className='reaction-btn' title="Report" onClick={() => setReport(report+1)}><img src={reportIcon} /> {report}</button>
                 </div>
                 <br />
-                {currentUser?.role==='admin' && (
+                {user?.role==='admin' && (
                     <button title='Delete' className='delete-btn' onClick={() => onDelete(id)}>
                         Delete
                     </button>

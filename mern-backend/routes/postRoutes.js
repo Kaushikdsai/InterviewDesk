@@ -28,7 +28,7 @@ router.post('/', authMiddleware, async (req,res) => {
     }
 });
 
-router.delete('/:id',adminMiddleware,async(req,res) => {
+router.delete('/:id',authMiddleware,adminMiddleware,async(req,res) => {
     try{
         await Post.findByIdAndDelete(req.params.id);
         res.json({ message: 'Post deleted successfully'});

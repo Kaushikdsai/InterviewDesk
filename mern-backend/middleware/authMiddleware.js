@@ -1,20 +1,13 @@
-const jwt = require('jsonwebtoken');
-
+const jwt=require('jsonwebtoken');
 const authMiddleware = (req, res, next) => {
-    const authHeader=req.header('Authorization');
-    console.log('Authorization header:', authHeader);
-
+    const authHeader=req.headers.authorization;
     const token=authHeader?.split(' ')[1];
-    console.log('Extracted token:', token);
-
     if(!token){
         return res.status(401).json({ message: 'No token' });
     }
-
     try{
         const decoded=jwt.verify(token, process.env.JWT_SECRET);
-        console.log('Decoded token:', decoded);
-        req.user = decoded;
+        req.user=decoded;
         next();
     }
     catch(err){
@@ -24,6 +17,9 @@ const authMiddleware = (req, res, next) => {
 };
 
 const adminMiddleware = (req,res,next) => {
+    if(!req.user){
+        return res.status(401).json({ message: 'No user found' });
+    }
     if(req.user.role!=='admin'){
         return res.status(403).json({ message: 'Access denied: Admins only'})
     }

@@ -18,6 +18,13 @@ const StudentLogin = () => {
             const res=await axios.post('http://localhost:5000/api/login', {regNo: username.toString(),password});
             setMessage('Login successful');
             localStorage.setItem('token',res.data.token);
+            const decoded=JSON.parse(atob(res.data.token.split('.')[1]));
+            if(decoded.role==='admin'){
+                navigate('/admin-dashboard');
+            }
+            else{
+                navigate('/');
+            }
             console.log('Token received from backend:', res.data.token);
             navigate('/');
 

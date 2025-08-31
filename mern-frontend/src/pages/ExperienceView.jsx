@@ -24,6 +24,8 @@ const ExperienceView = () => {
     useEffect(() => {
         if(!token){
             setLoggedin(false);
+            navigate('/login');
+            return;
         }
         if(token){
             setLoggedin(true);
@@ -45,7 +47,7 @@ const ExperienceView = () => {
             }
         };
         fetchPosts();
-    },[token]);
+    },[]);
 
     if(loading){
         return <h1>Loading...</h1>
@@ -83,7 +85,7 @@ const ExperienceView = () => {
 
     return (
         <div>
-            {loggedin? (
+            {loggedin && (
                 <div className='exp-view-container'>
                     <button className='interview-exp-btn' onClick={() => navigate('/add-experience')}>Share your interview experience</button>
                     <div className='filter-bar'>
@@ -107,8 +109,6 @@ const ExperienceView = () => {
                         )}
                     </div>
                 </div>
-            ) : (
-                alert('Please login')
             )};
         </div>
     )

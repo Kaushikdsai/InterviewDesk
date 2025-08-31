@@ -4,7 +4,7 @@ const cors=require('cors');
 const authRoutes=require('./routes/authRoutes');
 const postRoutes=require('./routes/postRoutes');
 require('dotenv').config();
-
+const { authMiddleware, adminMiddleware } = require('./middleware/authMiddleware');
 const app=express();
 
 app.use(cors());
