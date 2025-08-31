@@ -1,0 +1,10 @@
+.detail-card{
+    margin-left: 1%;
+    font-family: 'Arial', sans-serif;
+    background-color: rgb(231, 231, 231);
+    width: 700px;
+    margin-top: 4%;
+    margin-left: 24.5%;
+    padding: 4%;
+    border-radius: 9px;
+}

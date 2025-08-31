@@ -6,6 +6,7 @@ import ExperienceCard from './components/ExperienceCard';
 import AddExperience from './pages/AddExperience';
 import ExperienceView from './pages/ExperienceView';
 import Navbar from './components/Navbar';
+import ExperienceDetail from './pages/ExperienceDetail';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
             <Route path='/register' element={<StudentRegister />} />
             <Route path='/' element={<ExperienceView />} />
             <Route path='/add-experience' element={<AddExperience />} />
+            <Route path='/experience/:id' element={<ExperienceDetail />} />
           </Routes>
         </Router>
       </div>

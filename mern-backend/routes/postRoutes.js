@@ -28,6 +28,17 @@ router.post('/', authMiddleware, async (req,res) => {
     }
 });
 
+router.get('/:id', async(req,res) => {
+    const id=req.params.id;
+    const post=await Post.findById(id);
+    if(post){
+        return res.json(post);
+    }
+    else{
+        res.status(500).json({ message: err.message });
+    }
+})
+
 router.delete('/:id',authMiddleware,adminMiddleware,async(req,res) => {
     try{
         await Post.findByIdAndDelete(req.params.id);
