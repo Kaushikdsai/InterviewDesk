@@ -13,14 +13,23 @@
     background-color: rgb(69, 69, 69);
     color: white;
 }
+.exp-container {
+    margin-top: 22px;        
+    background-color: rgb(145, 145, 145);
+    display: flex;
+    justify-content: center;   
+    padding: 20px 0;           
+}
+
 .exp-cards-container {
     display: flex;
-    flex-wrap: wrap;      
-    justify-content: center; 
-    gap: 24px;            
-    margin-top: 40px;
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;      
+    align-items: flex-start;    
+    width: 1414px;          
 }
+
 .filter-bar input{
     margin-top: 18px;
     width: 140px;

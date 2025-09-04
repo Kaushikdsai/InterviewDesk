@@ -1,14 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import '../styles/ExperienceCard.css'
 import thumbsDown from '../assets/thumb-down.png'
 import thumbsUp from '../assets/thumb-up (1).png'
 import reportIcon from '../assets/flag.png'
+import axios from 'axios';
 
-const ExperienceCard = ({ id,company,user,role,status,studentName,studentBatch,onDelete }) => {
+const ExperienceCard = ({ id,company,role,status,studentName,studentBatch,currentUser,onDelete }) => {
     const [likes,setLikes]=useState(0);
     const [dislikes,setDislikes]=useState(0);
     const [report,setReport]=useState(0);
+
+    const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        console.log("ADMIN : "+currentUser?.isAdmin);
+        axios.get(`http://localhost:5000/api/posts/${id}`)
+            .then(res => {
+                setLikes(res.data.likes);
+                setDislikes(res.data.dislikes);
+                setReport(res.data.report);
+                console.log("RES: "+res);
+            })
+            .catch(err => console.error(err));
+    }, [id]);
 
     const getColor = () => {
         if(status.toLowerCase()==='accepted'){
@@ -21,6 +36,20 @@ const ExperienceCard = ({ id,company,user,role,status,studentName,studentBatch,o
             return 'black';
         }
     }
+
+    const handleReaction = async (type) => {
+        try{
+            const res=await axios.patch(`http://localhost:5000/api/posts/${id}/reaction`, {type},
+                {headers: {Authorization: `Bearer ${token}`}}
+            );
+            setLikes(res.data.likes);
+            setDislikes(res.data.dislikes);
+            setReport(res.data.report);
+        }
+        catch(err){
+            console.error(err);
+        }
+    };
 
     return (
         <>
@@ -35,13 +64,13 @@ const ExperienceCard = ({ id,company,user,role,status,studentName,studentBatch,o
                 <Link to={`/experience/${id}`}>View more</Link>
                 <br />
                 <div className='btn'>
-                    <button className='reaction-btn' title="Like" onClick={() => setLikes(likes+1)}><img src={thumbsUp} /> {likes}</button>
-                    <button className='reaction-btn' title="Dislike" onClick={() => setDislikes(dislikes+1)}><img src={thumbsDown} /> {dislikes}</button>
-                    <button className='reaction-btn' title="Report" onClick={() => setReport(report+1)}><img src={reportIcon} /> {report}</button>
+                    <button className='reaction-btn' title="Like" onClick={() => handleReaction('like')}><img src={thumbsUp} /> {likes}</button>
+                    <button className='reaction-btn' title="Dislike" onClick={() => handleReaction('dislike')}><img src={thumbsDown} /> {dislikes}</button>
+                    <button className='reaction-btn' title="Report" onClick={() => handleReaction('report')}><img src={reportIcon} /> {report}</button>
                 </div>
                 <br />
-                {user?.role==='admin' && (
-                    <button title='Delete' className='delete-btn' onClick={() => onDelete(id)}>
+                {currentUser?.isAdmin && (
+                    <button title='' className='-btn' onClick={() => onDelete(id)}>
                         Delete
                     </button>
                 )}

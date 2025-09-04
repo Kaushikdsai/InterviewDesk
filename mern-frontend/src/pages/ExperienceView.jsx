@@ -30,7 +30,7 @@ const ExperienceView = () => {
         if(token){
             setLoggedin(true);
             const decoded=jwtDecode(token);
-            setCurrentUser({ role: decoded.role });
+            setCurrentUser({ isAdmin: decoded.isAdmin });
         }
 
         const fetchPosts=async () => {
@@ -53,15 +53,22 @@ const ExperienceView = () => {
         return <h1>Loading...</h1>
     }
 
-    const applyFilters = () => {
-        const filtered=posts.filter(post => 
-            (roleFilter==='' || post.role.toLowerCase().includes(roleFilter.toLowerCase())) && 
-            (companyFilter === '' || post.company.toLowerCase().includes(companyFilter.toLowerCase())) &&
-            (statusFilter === '' || post.status.toLowerCase().includes(statusFilter.toLowerCase())) &&
-            (nameFilter === '' || post.author?.name.toLowerCase().includes(nameFilter.toLowerCase())) && 
-            (batchFilter === '' || post.author?.batch.toLowerCase().includes(batchFilter.toLowerCase()))
-        );
-        setFilteredPosts(filtered);
+    const applyFilters = async () => {
+        try{
+            const res=await axios.get('http://localhost:5000/api/posts', {
+                params: {
+                    role: roleFilter,
+                    company: companyFilter,
+                    status: statusFilter,
+                    name: nameFilter,
+                    batch: batchFilter
+                }
+            });
+            setFilteredPosts(res.data);
+        }
+        catch(err){
+            console.error(err);
+        }
     };
 
     const handleDelete = async(id) => {
@@ -79,10 +86,6 @@ const ExperienceView = () => {
         }
     }
 
-    const handleLogout = () => {
-        navigate('/login');
-    }
-
     return (
         <div>
             {loggedin && (
@@ -97,16 +100,18 @@ const ExperienceView = () => {
                         <br />
                         <button className='apply-filter-btn' onClick={applyFilters}>Apply Filter</button>
                     </div>
-                    <div className='exp-cards-container'>
-                        {filteredPosts.length>0 ? (
-                            filteredPosts.map(post => (
-                                <div key={post._id} className='exp-card'>
-                                    <ExperienceCard id={post._id} role={post.role} company={post.company} status={post.status} studentName={post.author?.name} studentBatch={post.author?.batch} onDelete={handleDelete}/>
-                                </div>
-                            ))
-                        ) : (
-                            <p>No posts found.</p>
-                        )}
+                    <div className='exp-container'>
+                        <div className='exp-cards-container'>
+                            {filteredPosts.length>0 ? (
+                                filteredPosts.map(post => (
+                                    <div key={post._id} className='exp-card'>
+                                        <ExperienceCard id={post._id} role={post.role} company={post.company} status={post.status} studentName={post.author?.name} studentBatch={post.author?.batch} currentUser={currentUser} onDelete={handleDelete}/>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No posts found.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             )};

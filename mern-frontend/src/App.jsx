@@ -16,10 +16,9 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            <Route path='/h' element={<ExperienceCard />} />
             <Route path='/login' element={<StudentLogin />} />
             <Route path='/register' element={<StudentRegister />} />
-            <Route path='/' element={<ExperienceView />} />
+            <Route path='/experience-view' element={<ExperienceView />} />
             <Route path='/add-experience' element={<AddExperience />} />
             <Route path='/experience/:id' element={<ExperienceDetail />} />
           </Routes>

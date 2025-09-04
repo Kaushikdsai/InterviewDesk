@@ -20,7 +20,7 @@ const adminMiddleware = (req,res,next) => {
     if(!req.user){
         return res.status(401).json({ message: 'No user found' });
     }
-    if(req.user.role!=='admin'){
+    if(!req.user.isAdmin){
         return res.status(403).json({ message: 'Access denied: Admins only'})
     }
     next();

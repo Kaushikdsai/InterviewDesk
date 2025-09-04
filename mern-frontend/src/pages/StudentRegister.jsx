@@ -36,7 +36,7 @@ const StudentRegister = () => {
               <input id='email' type='email' name='email' value={email} onChange={(e) => setEmail(e.target.value)}  placeholder='Email' />
               <input id='password' type='password' name='password' value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Password' />
               <button className='reg-btn' type='submit'>Register</button>
-              <p>Already have an account? <Link to='/login'>Click here</Link></p>
+              <p>Already have an account? <Link to='/'>Click here</Link></p>
           </form>
       </>
     )

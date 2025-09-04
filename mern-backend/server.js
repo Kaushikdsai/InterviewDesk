@@ -15,6 +15,7 @@ app.use('/api/posts',postRoutes);
 const mongoURI=process.env.MONGO_URI;
 
 mongoose.connect(mongoURI,{
+    maxPoolSize: 100,
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
