@@ -16,7 +16,7 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            <Route path='/login' element={<StudentLogin />} />
+            <Route path='/' element={<StudentLogin />} />
             <Route path='/register' element={<StudentRegister />} />
             <Route path='/experience-view' element={<ExperienceView />} />
             <Route path='/add-experience' element={<AddExperience />} />

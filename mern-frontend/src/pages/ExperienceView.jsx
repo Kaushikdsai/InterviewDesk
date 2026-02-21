@@ -36,6 +36,7 @@ const ExperienceView = () => {
         const fetchPosts=async () => {
             try{
                 const res=await axios.get('http://localhost:5000/api/posts');
+                console.log(res.data);
                 setPosts(res.data);
                 setFilteredPosts(res.data);
             }

@@ -59,8 +59,8 @@ const ExperienceCard = ({ id,company,role,status,studentName,studentBatch,curren
                 <h2>Role: {role}</h2>
                 <br />
                 <h3 style={{ color: getColor() }}>{status}</h3>
-                <p>- {studentName}{studentBatch && <span>({studentBatch})</span> }</p>
-                {studentBatch && <p>Batch: {studentBatch}</p>}
+                <p>- {studentName} {studentBatch && <span>({studentBatch})</span> }</p>
+                {studentBatch && <p> Batch: {studentBatch}</p>}
                 <Link to={`/experience/${id}`}>View more</Link>
                 <br />
                 <div className='btn'>

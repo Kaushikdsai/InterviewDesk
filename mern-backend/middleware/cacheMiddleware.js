@@ -1,25 +1,27 @@
-const redis=require("../config/redis");
+const redis = require("../config/redis");
 
-function cacheMiddleware(keyPrefix){
-    return async (req,res,next) => {
-        try{
-            const queryKey=JSON.stringify(req.query);
-            const key=keyPrefix+(req.params.id || queryKey || "all");
+function cacheMiddleware(keyPrefix) {
+  return async (req, res, next) => {
+    try {
+      // 🔥 If redis is disabled, skip caching completely
+      if (!redis) return next();
 
-            res.locals.cacheKey=key;
+      const queryKey = JSON.stringify(req.query);
+      const key = keyPrefix + (req.params.id || queryKey || "all");
 
-            const cachedData=await redis.get(key);
-            if(cachedData){
-              return res.json(JSON.parse(cachedData));
-            }
+      res.locals.cacheKey = key;
 
-            next();
-        }
-        catch(err){
-            console.error("Cache middleware error:", err);
-            next();
-        }
-    };
+      const cachedData = await redis.get(key);
+      if (cachedData) {
+        return res.json(JSON.parse(cachedData));
+      }
+
+      next();
+    } catch (err) {
+      console.error("Cache middleware error:", err.message);
+      next();
+    }
+  };
 }
 
 module.exports = cacheMiddleware;
