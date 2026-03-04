@@ -15,7 +15,7 @@ const StudentLogin = () => {
         setMessage('');
         try{
             console.log('Login payload:', { regNo: username, password });
-            const res=await axios.post('http://localhost:5000/api/login', {regNo: username.toString(),password});
+            const res=await axios.post('http://localhost:5000/api/login', {regNo: username.trim(),password});
             setMessage('Login successful');
             localStorage.setItem('token',res.data.token);
             navigate('/experience-view');
@@ -30,8 +30,8 @@ const StudentLogin = () => {
       <>
           <form className='login-form' onSubmit={handleSubmit}>
               <h1>LOGIN FORM</h1>
-              <input id='username' type='text' name='username' value={username} placeholder='Registration Number' onChange={(e) => setUsername(e.target.value)} />
-              <input id='password' type='password' name='password' value={password} placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
+              <input id='username' type='text' value={username} placeholder='Registration Number' onChange={(e) => setUsername(e.target.value)} />
+              <input id='password' type='password' value={password} placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
               <button className='login-btn' type='submit'>Login</button>
               {message && <p>{message}</p>}
               <p>Dont have an account? <Link to='/register'>Click here</Link></p>

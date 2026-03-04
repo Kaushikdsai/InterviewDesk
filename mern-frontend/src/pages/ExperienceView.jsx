@@ -22,7 +22,7 @@ const ExperienceView = () => {
     useEffect(() => {
         if(!token){
             setLoggedin(false);
-            navigate('/login');
+            navigate('/');
             return;
         }
         setLoggedin(true);

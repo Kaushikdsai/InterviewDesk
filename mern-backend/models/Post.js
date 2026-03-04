@@ -14,7 +14,7 @@ const postSchema=new mongoose.Schema({
     likes: {type: Number, default: 0},
     dislikes: {type: Number, default: 0},
     report: {type: Number, default: 0},
-    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true},
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     usersLiked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     usersDisliked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     usersReported: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
