@@ -2,10 +2,8 @@ const express=require('express');
 const router=express.Router();
 const Post=require('../models/Post');
 const { authMiddleware,adminMiddleware }=require('../middleware/authMiddleware');
-const redis=require('../config/redis');
-const cacheMiddleware=require('../middleware/cacheMiddleware');
 
-router.get('/', cacheMiddleware("posts:"), async (req, res) => {
+router.get('/',async (req, res) => {
     try{
         const { role, company, status } = req.query;
 
@@ -15,14 +13,6 @@ router.get('/', cacheMiddleware("posts:"), async (req, res) => {
         if (status) query.status = { $regex: status, $options: 'i' };
 
         const posts=await Post.find(query).populate('author', 'name batch');
-
-        if(redis){
-            await redis.setex(
-                res.locals.cacheKey,
-                3600,
-                JSON.stringify(posts)
-            );
-        }
 
         res.json(posts);
     }
@@ -50,9 +40,6 @@ router.post('/', authMiddleware, async (req, res) => {
         });
 
         await newPost.save();
-        if(redis){
-            await redis.del("posts:all");
-        }
 
         res.status(201).json({ message: 'Post created', newPost });
     } 
@@ -72,14 +59,6 @@ router.get('/:id', async (req, res) => {
       if(!post){
         return res.status(404).json({ message: "Post not found" });
       }
-
-      if(redis && res.locals.cacheKey){
-          await redis.setex(
-            res.locals.cacheKey,
-            3600,
-            JSON.stringify(post)
-          );
-      }
       res.json(post);
     } 
     catch(err){
@@ -94,12 +73,6 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
       await Post.findByIdAndDelete(req.params.id);
-
-      if(redis){
-          await redis.del("posts:all");
-          await redis.del(`posts:${req.params.id}`);
-      }
-
       res.json({ message: 'Post deleted successfully' });
     } 
     catch(err){
@@ -153,14 +126,9 @@ router.patch('/:id/reaction', authMiddleware, async (req, res) => {
 
       await currPost.save();
 
-      if (redis) {
-        await redis.del("posts:all");
-        await redis.del(`posts:${req.params.id}`);
-      }
-
       res.json(currPost);
     } 
-    catch (err) {
+    catch(err){
       console.error("REACTION ERROR:", err.message);
       res.status(500).json({ message: err.message });
     }

@@ -1,10 +1,17 @@
-/*
-const {Redis}=require('ioredis');
+const { createClient } = require("redis");
 
-const redis=new Redis(
-    "rediss://default:AUj7AAIncDE0MTY5NzZhN2QzNTI0NTZhODJkZjE2ZWI4NjI2OGRjY3AxMTg2ODM@bold-troll-18683.upstash.io:6379"
-);
+const redisClient = createClient({
+    url: "redis://127.0.0.1:6379"
+});
 
-redis.on("connect", () => console.log("Redis connected"));
-*/
-module.exports=null;
+redisClient.on("connect", () => {
+    console.log("Redis connected");
+});
+
+redisClient.on("error", (err) => {
+    console.error("Redis error:", err);
+});
+
+redisClient.connect();
+
+module.exports = redisClient;

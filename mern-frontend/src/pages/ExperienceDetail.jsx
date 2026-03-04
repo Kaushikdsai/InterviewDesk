@@ -10,12 +10,12 @@ const ExperienceDetail = () => {
     const [loading, setLoading]=useState(true);
     const [error, setError]=useState(null);
 
-    const pdfRef = useRef(null);
+    const pdfRef=useRef(null);
 
     useEffect(() => {
         const fetchExperience=async () => {
             try{
-                const res = await axios.get(`http://localhost:5000/api/posts/${id}`);
+                const res=await axios.get(`http://localhost:5000/api/posts/${id}`);
                 setExperience(res.data);
             }
             catch(err){

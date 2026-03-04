@@ -6,17 +6,15 @@ import ExperienceCard from '../components/ExperienceCard';
 import '../styles/ExperienceView.css'
 
 const ExperienceView = () => {
-    const [posts,setPosts]=useState([]);
     const [filteredPosts,setFilteredPosts]=useState([]);
     const [loading,setLoading]=useState(true);
     const [loggedin,setLoggedin]=useState(false);
-
     const [roleFilter,setRoleFilter]=useState('');
     const [companyFilter,setCompanyFilter]=useState('');
     const [statusFilter,setStatusFilter]=useState('');
     const [nameFilter,setNameFilter]=useState('');
     const [batchFilter,setBatchFilter]=useState('');
-    const [currentUser,setCurrentUser]=useState('');
+    const [currentUser,setCurrentUser]=useState(null);
 
     const navigate=useNavigate();
     const token=localStorage.getItem('token');
@@ -27,17 +25,14 @@ const ExperienceView = () => {
             navigate('/login');
             return;
         }
-        if(token){
-            setLoggedin(true);
-            const decoded=jwtDecode(token);
-            setCurrentUser({ isAdmin: decoded.isAdmin });
-        }
+        setLoggedin(true);
+        const decoded=jwtDecode(token);
+        setCurrentUser({ isAdmin: decoded.isAdmin });
 
         const fetchPosts=async () => {
             try{
                 const res=await axios.get('http://localhost:5000/api/posts');
                 console.log(res.data);
-                setPosts(res.data);
                 setFilteredPosts(res.data);
             }
             catch(err){
@@ -77,8 +72,7 @@ const ExperienceView = () => {
             await axios.delete(`http://localhost:5000/api/posts/${id}`, {
                 headers: { Authorization: `Bearer ${token}`}
             });
-            setPosts(prev => prev.filter(p => p._id !== id));
-            setFilteredPosts(filteredPosts.filter(p => p._id !== id));
+            setFilteredPosts(prev => prev.filter(p => p._id !== id));
             alert('Post deleted successfully');
         }
         catch(err){

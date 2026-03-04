@@ -3,9 +3,9 @@ const mongoose=require('mongoose');
 const userSchema=new mongoose.Schema({
     name: {type: String, required: true},
     batch: {type: Number, required: true},
-    regNo: {type: String, required: true, unique: true},
+    regNo: {type: String, required: true, unique: true, index: true},
     contact: String,
-    email: {type: String, required: true, unique: true},
+    email: {type: String, required: true, unique: true, index: true},
     password: {type: String, required: true},
     isAdmin: {type: Boolean, default: false}
 }, {timestamps: true});
