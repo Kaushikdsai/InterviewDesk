@@ -36,56 +36,56 @@ router.get('/', cacheMiddleware("posts:"), async (req, res) => {
    CREATE POST
 ======================= */
 router.post('/', authMiddleware, async (req, res) => {
-  try {
-    const { company, role, status, experience, questions, additionalInfo } = req.body;
+    try{
+        const { company, role, status, experience, questions, additionalInfo }=req.body;
 
-    const newPost = new Post({
-      company,
-      role,
-      status,
-      experience,
-      questions,
-      additionalInfo,
-      author: req.user.id
-    });
+        const newPost=new Post({
+            company,
+            role,
+            status,
+            experience,
+            questions,
+            additionalInfo,
+            author: req.user.id
+        });
 
-    await newPost.save();
+        await newPost.save();
+        if(redis){
+            await redis.del("posts:all");
+        }
 
-    if (redis) {
-      await redis.del("posts:all");
+        res.status(201).json({ message: 'Post created', newPost });
+    } 
+    catch(err){
+      console.error("CREATE POST ERROR:", err.message);
+      res.status(500).json({ message: err.message });
     }
-
-    res.status(201).json({ message: 'Post created', newPost });
-  } catch (err) {
-    console.error("CREATE POST ERROR:", err.message);
-    res.status(500).json({ message: err.message });
-  }
 });
 
 /* =======================
    GET POST BY ID
 ======================= */
 router.get('/:id', async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
+    try{
+      const post=await Post.findById(req.params.id);
 
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+      if(!post){
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      if(redis && res.locals.cacheKey){
+          await redis.setex(
+            res.locals.cacheKey,
+            3600,
+            JSON.stringify(post)
+          );
+      }
+      res.json(post);
+    } 
+    catch(err){
+      console.error("GET POST ERROR:", err.message);
+      res.status(500).json({ message: err.message });
     }
-
-    if (redis && res.locals.cacheKey) {
-      await redis.setex(
-        res.locals.cacheKey,
-        3600,
-        JSON.stringify(post)
-      );
-    }
-
-    res.json(post);
-  } catch (err) {
-    console.error("GET POST ERROR:", err.message);
-    res.status(500).json({ message: err.message });
-  }
 });
 
 /* =======================
@@ -93,75 +93,77 @@ router.get('/:id', async (req, res) => {
 ======================= */
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    await Post.findByIdAndDelete(req.params.id);
+      await Post.findByIdAndDelete(req.params.id);
 
-    if (redis) {
-      await redis.del("posts:all");
-      await redis.del(`posts:${req.params.id}`);
+      if(redis){
+          await redis.del("posts:all");
+          await redis.del(`posts:${req.params.id}`);
+      }
+
+      res.json({ message: 'Post deleted successfully' });
+    } 
+    catch(err){
+      console.error("DELETE POST ERROR:", err.message);
+      res.status(500).json({ message: err.message });
     }
-
-    res.json({ message: 'Post deleted successfully' });
-  } catch (err) {
-    console.error("DELETE POST ERROR:", err.message);
-    res.status(500).json({ message: err.message });
-  }
 });
 
 /* =======================
    REACTIONS
 ======================= */
 router.patch('/:id/reaction', authMiddleware, async (req, res) => {
-  try {
-    const { type } = req.body;
-    const userId = req.user.id;
-
-    const currPost = await Post.findById(req.params.id);
-    if (!currPost) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    if (type === 'like') {
-      if (currPost.usersLiked.includes(userId)) {
-        currPost.usersLiked = currPost.usersLiked.filter(id => id.toString() !== userId);
-      } else {
-        currPost.usersDisliked = currPost.usersDisliked.filter(id => id.toString() !== userId);
-        currPost.usersLiked.push(userId);
+    try{
+      const { type }=req.body;
+      const userId=req.user.id;
+      const currPost=await Post.findById(req.params.id);
+      if(!currPost){
+          return res.status(404).json({ message: "Post not found" });
       }
-    }
 
-    if (type === 'dislike') {
-      if (currPost.usersDisliked.includes(userId)) {
-        currPost.usersDisliked = currPost.usersDisliked.filter(id => id.toString() !== userId);
-      } else {
-        currPost.usersLiked = currPost.usersLiked.filter(id => id.toString() !== userId);
-        currPost.usersDisliked.push(userId);
+      if(type==='like'){
+          if(currPost.usersLiked.includes(userId)) {
+            currPost.usersLiked=currPost.usersLiked.filter(id => id.toString() !== userId);
+          }
+          else{
+            currPost.usersDisliked=currPost.usersDisliked.filter(id => id.toString() !== userId);
+            currPost.usersLiked.push(userId);
+          }
       }
-    }
 
-    if (type === 'report') {
-      if (!currPost.usersReported.includes(userId)) {
-        currPost.usersReported.push(userId);
-      } else {
-        currPost.usersReported = currPost.usersReported.filter(id => id.toString() !== userId);
+      if (type === 'dislike') {
+        if (currPost.usersDisliked.includes(userId)) {
+          currPost.usersDisliked = currPost.usersDisliked.filter(id => id.toString() !== userId);
+        } else {
+          currPost.usersLiked = currPost.usersLiked.filter(id => id.toString() !== userId);
+          currPost.usersDisliked.push(userId);
+        }
       }
+
+      if (type === 'report') {
+        if (!currPost.usersReported.includes(userId)) {
+          currPost.usersReported.push(userId);
+        } else {
+          currPost.usersReported = currPost.usersReported.filter(id => id.toString() !== userId);
+        }
+      }
+
+      currPost.likes = currPost.usersLiked.length;
+      currPost.dislikes = currPost.usersDisliked.length;
+      currPost.report = currPost.usersReported.length;
+
+      await currPost.save();
+
+      if (redis) {
+        await redis.del("posts:all");
+        await redis.del(`posts:${req.params.id}`);
+      }
+
+      res.json(currPost);
+    } 
+    catch (err) {
+      console.error("REACTION ERROR:", err.message);
+      res.status(500).json({ message: err.message });
     }
-
-    currPost.likes = currPost.usersLiked.length;
-    currPost.dislikes = currPost.usersDisliked.length;
-    currPost.report = currPost.usersReported.length;
-
-    await currPost.save();
-
-    if (redis) {
-      await redis.del("posts:all");
-      await redis.del(`posts:${req.params.id}`);
-    }
-
-    res.json(currPost);
-  } catch (err) {
-    console.error("REACTION ERROR:", err.message);
-    res.status(500).json({ message: err.message });
-  }
 });
 
 module.exports = router;
